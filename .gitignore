@@ -1,2 +1,5 @@
 test-wallet-app
 *.swp
+out
+cache
+.env
