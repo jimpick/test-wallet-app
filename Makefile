@@ -38,4 +38,8 @@ cast-send-coin-async-replace:
 nonce:
 	cast nonce ${OWNER} --rpc-url ${CALIBRATIONNET_RPC_URL}
 
+cast-send-coin-3:
+	./test-wallet-app send-coin owner test1 1
+
+
 .PHONY: abigen

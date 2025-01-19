@@ -21,6 +21,7 @@ var sendCoinCmd = &cobra.Command{
 	Short: "Sends simple coins from one account to another account",
 	Args:  cobra.ExactArgs(3),
 	Run: func(cmd *cobra.Command, args []string) {
+		ctx := cmd.Context()
 		from := args[0]
 		msig := ""
 		/*
@@ -45,6 +46,11 @@ var sendCoinCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
+		gasMultiply, err := cmd.Flags().GetFloat64("gas-multiply")
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		// from, msig := getFromAndMsigFromFlags(cmd)
 
 		ethClientShim, auth, err := getAuthInstance(cmd.Context(), from, msig)
@@ -56,6 +62,16 @@ var sendCoinCmd = &cobra.Command{
 		if err != nil {
 			logFatal(err)
 		}
+
+		tipCap, err := ethClientShim.SuggestGasTipCap(ctx)
+		if err != nil {
+			logFatal(err)
+		}
+		log.Printf("Suggested GasTipCap: %v\n", tipCap)
+		tipCapFloat, _ := tipCap.Float64()
+		scaledTipCap := tipCapFloat * gasMultiply
+		auth.GasTipCap = big.NewInt(int64(scaledTipCap))
+		log.Printf("Scaled GasTipCap: %v\n", auth.GasTipCap)
 
 		tx, err := simpleCoinCaller.SendCoin(auth, toEth, big.NewInt(int64(amount)))
 		if err != nil {
@@ -69,4 +85,5 @@ var sendCoinCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(sendCoinCmd)
+	sendCoinCmd.Flags().Float64("gas-multiply", 1.0, "Multiply the default gas premium by this amount")
 }
