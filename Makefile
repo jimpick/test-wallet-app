@@ -13,8 +13,11 @@ solc-output:
 abigen:
 	cd scripts; ./abigen.sh
 
-cast-balance:
-	cast --from-wei `cast call ${SIMPLE_COIN} 'getBalance(address)' ${OWNER} --rpc-url ${CALIBRATIONNET_RPC_URL}`
+cast-get-balance-owner:
+	cast --to-dec `cast call ${SIMPLE_COIN} 'getBalance(address)' ${OWNER} --rpc-url ${CALIBRATIONNET_RPC_URL}`
+
+cast-get-balance-test1:
+	cast --to-dec `cast call ${SIMPLE_COIN} 'getBalance(address)' ${TEST1} --rpc-url ${CALIBRATIONNET_RPC_URL}`
 
 cast-send-coin:
 	cast send ${SIMPLE_COIN} 'sendCoin(address, uint)' ${TEST1} 1 --rpc-url ${CALIBRATIONNET_RPC_URL} --private-key ${PRIVATE_KEY}
