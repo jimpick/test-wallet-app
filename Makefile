@@ -41,5 +41,12 @@ nonce:
 cast-send-coin-3:
 	./test-wallet-app send-coin owner test1 1
 
+cast-send-coin-3-replace:	NONCE=$(shell cast nonce ${OWNER} --rpc-url ${CALIBRATIONNET_RPC_URL})
+cast-send-coin-3-replace:
+	@echo Nonce: ${NONCE}
+	./test-wallet-app send-coin owner test1 1
+	sleep 10
+	./test-wallet-app send-coin owner test1 1 --gas-multiply 1.5 --nonce ${NONCE}
+
 
 .PHONY: abigen

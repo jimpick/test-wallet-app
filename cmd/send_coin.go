@@ -24,12 +24,6 @@ var sendCoinCmd = &cobra.Command{
 		ctx := cmd.Context()
 		from := args[0]
 		msig := ""
-		/*
-			from, _, err := KeyStore.GetAddr(args[0])
-			if err != nil {
-				log.Fatal(err)
-			}
-		*/
 
 		to, keyType, err := KeyStore.GetAddr(args[1])
 		if err != nil {
@@ -47,6 +41,11 @@ var sendCoinCmd = &cobra.Command{
 		}
 
 		gasMultiply, err := cmd.Flags().GetFloat64("gas-multiply")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		nonce, err := cmd.Flags().GetUint64("nonce")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -73,6 +72,10 @@ var sendCoinCmd = &cobra.Command{
 		auth.GasTipCap = big.NewInt(int64(scaledTipCap))
 		log.Printf("Scaled GasTipCap: %v\n", auth.GasTipCap)
 
+		if nonce > 0 {
+			auth.Nonce = big.NewInt(int64(nonce))
+		}
+
 		tx, err := simpleCoinCaller.SendCoin(auth, toEth, big.NewInt(int64(amount)))
 		if err != nil {
 			logFatal(err)
@@ -86,4 +89,5 @@ var sendCoinCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(sendCoinCmd)
 	sendCoinCmd.Flags().Float64("gas-multiply", 1.0, "Multiply the default gas premium by this amount")
+	sendCoinCmd.Flags().Uint64("nonce", 0, "Specify nonce (for replacing transactions)")
 }
